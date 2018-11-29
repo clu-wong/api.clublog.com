@@ -3,6 +3,8 @@ package models
 import (
 	"github.com/jinzhu/gorm"
 	"api.clublog.com/libs/configs"
+	"net/url"
+	"api.clublog.com/libs/utils"
 )
 
 type Post struct{
@@ -29,6 +31,11 @@ func (post Post) user() User{
 	var user User
 	configs.Db.Where("id = ? ", post.UserId).First(&user)
 	return user
+}
+func (post *Post) New(formData url.Values) {
+	post.Title = formData.Get("title")
+	post.Content = formData.Get("content")
+	post.UserId = utils.ParseInt(formData.Get("author_id"))
 }
 
 func ListData(data_mapping interface{}, total int, current int) map[string]interface{}{

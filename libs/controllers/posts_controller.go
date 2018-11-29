@@ -60,7 +60,22 @@ func ShowPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
 	}
 }
 func CreatePost(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
-
+	if CheckJwt(r){
+		var post models.Post
+		var data interface{}
+		r.ParseForm()
+		post.New(r.Form)
+		err := configs.Db.Create(&post)
+		if err.Error != nil{
+			data = err.Error
+		}else{
+			data = post.JsonMap(models.User{})
+		}
+		result := ResultData2Json{200,"success", "", data}
+		Render2Json(w, r, &result)
+	}else{
+		Render400(w, r)
+	}
 }
 
 func UpdatePost(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
