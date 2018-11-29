@@ -6,8 +6,6 @@ import (
 	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"time"
-	_ "api.clublog.com/libs/models"
-	"api.clublog.com/libs/models"
 )
 
 var Config *toml.Tree
@@ -35,5 +33,4 @@ func Init(){
 		Password: "",
 		DB: 0})
 
-	Db.AutoMigrate(&models.User{}, &models.Post{})
 }

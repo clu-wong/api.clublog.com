@@ -1,4 +1,4 @@
 [development]
 mysql_config= "root:12345678@/goblogdb?charset=utf8mb4&parseTime=True&loc=Local"
 redis_config= "localhost:6379"
-session_expire = 10
+session_expire = 0

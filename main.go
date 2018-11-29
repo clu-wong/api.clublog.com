@@ -2,18 +2,20 @@ package main
 
 import (
 
-	_ "clublog/lib/models"
-
 	"api.clublog.com/libs/configs"
+	_ "api.clublog.com/libs/models"
 	"net/http"
 	"api.clublog.com/libs/controllers"
+	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
 	configs.Init()
-	http.HandleFunc("/sessions/new", controllers.NewSession)
-	//router := httprouter.New()
-	//router.GET("/posts/:id", controllers.Posts)
+	router := httprouter.New()
+	router.POST("/sessions/new", controllers.NewSession)
+	router.GET("/posts", controllers.ListAllPosts)
+	router.GET("/posts/:id", controllers.ShowPost)
+	router.POST("/posts", controllers.CreatePost)
 
-	http.ListenAndServe(":8001", nil)
+	http.ListenAndServe(":8001", router)
 }

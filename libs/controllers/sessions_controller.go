@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"net/http"
-	_ "api.clublog.com/libs/configs"
 	"api.clublog.com/libs/configs"
-	"clublog/lib/models"
 	"github.com/satori/go.uuid"
 	"fmt"
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
+	"api.clublog.com/libs/models"
 )
 
 type ResultData2Json struct{
@@ -26,11 +26,14 @@ func Render2Json(w http.ResponseWriter, r *http.Request, resp_data *ResultData2J
 }
 
 func CheckJwt(r *http.Request) bool{
-	jwt := r.Header.Get("jwt")
+	jwt := r.Header.Get("Jwt")
+	fmt.Println(jwt)
 	if jwt == ""{
 		return false
 	}
+	fmt.Println(configs.RedisClient)
 	result := configs.RedisClient.Get(jwt)
+	fmt.Println(result)
 	if jwt != "" && result.Val() != ""{
 		configs.RedisClient.Set(jwt, result.Val(), configs.SessionExpired)
 		return true
@@ -39,17 +42,13 @@ func CheckJwt(r *http.Request) bool{
 	}
 }
 
-func FilterProtect(w http.ResponseWriter, r *http.Request){
-	if !CheckJwt(r){
-		var result ResultData2Json
-		result= ResultData2Json{400, "fail", "token error",nil}
-		Render2Json(w, r, &result)
-		return
-	}
+func Render400(w http.ResponseWriter, r *http.Request){
+	var result ResultData2Json
+	result= ResultData2Json{400, "fail", "token error",nil}
+	Render2Json(w, r, &result)
 }
 
-
-func NewSession(w http.ResponseWriter, r *http.Request){
+func NewSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
 	var result ResultData2Json
 	if r.Method != "POST"{
 		result= ResultData2Json{400, "fail", "access denied",nil}
