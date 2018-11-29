@@ -51,8 +51,13 @@ func ShowPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
 	if CheckJwt(r){
 		var post models.Post
 		var user models.User
-		configs.Db.Model(models.Post{}).Where("id = ?", ps.ByName("id")).Find(&post)//.Related(&user)
-		data := post.JsonMap(user)
+		var data interface{}
+		err := configs.Db.Model(models.Post{}).Where("id = ?", ps.ByName("id")).Find(&post)//.Related(&user)
+		if err.RowsAffected == 0{
+			data = "未找到数据"
+		}else{
+			data = post.JsonMap(user)
+		}
 		result := ResultData2Json{200,"success", "", data}
 		Render2Json(w, r, &result)
 	}else{
